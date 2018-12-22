@@ -2,7 +2,7 @@ pipeline {
     agent {
         kubernetes {
             cloud 'kubernetes'
-            label "${env.BUILD_NUMBER}.${env.JOB_NAME.split('/').reverse().join('.')}"
+            label "${env.JOB_NAME.split('/').join('.')}.${env.BUILD_NUMBER}"
             containerTemplate {
                 name 'jnlp'
                 image 'jenkins/jnlp-slave:3.27-1-alpine'
@@ -16,13 +16,6 @@ pipeline {
         }
     }
     stages {
-        stage ('Info') {
-            steps {
-                container('maven') {
-                    sh 'env'
-                }
-            }
-        }
         stage ('Test') {
             steps {
                 container('maven') {
