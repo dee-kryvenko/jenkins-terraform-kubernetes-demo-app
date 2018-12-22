@@ -3,6 +3,10 @@ pipeline {
         kubernetes {
             label 'jenkins-jenkins-slave'
             containerTemplate {
+                name 'jnlp'
+                image 'jenkins/jnlp-slave:3.27-1-alpine'
+            }
+            containerTemplate {
                 name 'maven'
                 image 'maven:3.5.4-jdk-8-alpine'
                 ttyEnabled true
@@ -11,15 +15,6 @@ pipeline {
         }
     }
     stages {
-        stage ('Initialize') {
-            steps {
-                sh '''
-                    echo "PATH = ${PATH}"
-                    echo "M2_HOME = ${M2_HOME}"
-                ''' 
-            }
-        }
-
         stage ('Test') {
             steps {
                 container('maven') {
