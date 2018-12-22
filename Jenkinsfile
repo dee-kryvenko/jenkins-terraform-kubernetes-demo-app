@@ -1,7 +1,7 @@
 pipeline {
     agent {
         kubernetes {
-            cloud 'jenkins-jenkins-slave'
+            cloud 'kubernetes'
             label "${env.BUILD_NUMBER}.${env.BRANCH_NAME}.${env.REPO_NAME}.${env.REPO_ORG}"
             containerTemplate {
                 name 'jnlp'
