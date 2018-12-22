@@ -36,5 +36,11 @@ pipeline {
                 }
             }
         }
+
+        stage ('Image') {
+            steps {
+                kubernetes.image().withName("app").build().fromPath(".")
+            }
+        }
     }
 }
