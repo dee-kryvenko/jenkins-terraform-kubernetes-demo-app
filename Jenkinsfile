@@ -16,6 +16,13 @@ pipeline {
         }
     }
     stages {
+        stage ('Info') {
+            steps {
+                container('maven') {
+                    sh 'env'
+                }
+            }
+        }
         stage ('Test') {
             steps {
                 container('maven') {
