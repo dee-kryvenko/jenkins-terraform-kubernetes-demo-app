@@ -1,46 +1,25 @@
-pipeline {
-    agent {
-        kubernetes {
-            cloud 'kubernetes'
-            label "${env.JOB_NAME.split('/').join('.')}.${env.BUILD_NUMBER}"
-            containerTemplate {
-                name 'jnlp'
-                image 'jenkins/jnlp-slave:3.27-1-alpine'
-            }
-            containerTemplate {
-                name 'maven'
-                image 'maven:3.5.4-jdk-8-alpine'
-                ttyEnabled true
-                command 'cat'
-            }
-        }
-    }
-    stages {
-        stage ('Test') {
-            steps {
-                container('maven') {
-                    sh 'mvn verify'
-                }
-            }
-        }
+def label = "${env.JOB_NAME.split('/').join('.')}.${env.BUILD_NUMBER}"
 
-        stage ('Build') {
-            steps {
-                container('maven') {
-                    sh 'mvn install'
-                }
+podTemplate(label: label, containers: [
+    containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:3.27-1-alpine')
+    containerTemplate(name: 'maven', image: 'maven:3.5.4-jdk-8-alpine', ttyEnabled: true, command: 'cat')
+]) {
+    node(label) {
+        stage('Test') {
+            checkout scm
+            container('maven') {
+                sh 'mvn verify'
             }
-            post {
-                success {
-                    junit 'target/surefire-reports/**/*.xml' 
-                }
+            junit 'target/surefire-reports/**/*.xml'
+        }
+        stage('Build') {
+            checkout scm
+            container('maven') {
+                sh 'mvn package'
             }
         }
-
         stage ('Image') {
-            steps {
-                kubernetes.image().withName("app").build().fromPath(".")
-            }
+            kubernetes.image().withName("app").build().fromPath(".")
         }
     }
 }
