@@ -22,20 +22,22 @@ podTemplate(label: label, containers: [
                 sh 'mvn package'
             }
         }
-        stage ('Deploy') {
-            container('awscli') {
-                env.AWS_ACCOUNT_ID = sh(script: 'aws sts get-caller-identity --output text --query "Account"', returnStdout: true).trim()
-                sh 'aws ecr get-login --region us-east-1 --no-include-email > ecr_auth.sh'
-            }
-            def image = "${env.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/jenkins-terraform-kubernetes-demo-apps:${env.BUILD_NUMBER}"
-            container('docker') {
-                sh 'chmod +x ./ecr_auth.sh && ./ecr_auth.sh'
-                sh "docker build -t ${image} ."
-                sh "docker push ${image}"
-            }
-            def ingress = sh(script: "basename '${env.JENKINS_URL}'", returnStdout: true).trim()
-            container('helm') {
-                sh "helm upgrade --namespace 'jenkins' --install --force 'jenkins-terraform-kubernetes-demo-app' './helm/jenkins-terraform-kubernetes-demo-app' --set app.container.image='${image}' --set app.host='${ingress}' --reset-values --wait"
+        if (env.BRANCH_NAME == 'master') {
+            stage ('Deploy') {
+                container('awscli') {
+                    env.AWS_ACCOUNT_ID = sh(script: 'aws sts get-caller-identity --output text --query "Account"', returnStdout: true).trim()
+                    sh 'aws ecr get-login --region us-east-1 --no-include-email > ecr_auth.sh'
+                }
+                def image = "${env.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/jenkins-terraform-kubernetes-demo-apps:${env.BUILD_NUMBER}"
+                container('docker') {
+                    sh 'chmod +x ./ecr_auth.sh && ./ecr_auth.sh'
+                    sh "docker build -t ${image} ."
+                    sh "docker push ${image}"
+                }
+                def ingress = sh(script: "basename '${env.JENKINS_URL}'", returnStdout: true).trim()
+                container('helm') {
+                    sh "helm upgrade --namespace 'jenkins' --install --force 'jenkins-terraform-kubernetes-demo-app' './helm/jenkins-terraform-kubernetes-demo-app' --set app.container.image='${image}' --set app.host='${ingress}' --reset-values --wait"
+                }
             }
         }
     }
