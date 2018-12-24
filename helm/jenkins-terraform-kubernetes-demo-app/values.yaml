@@ -1,0 +1,8 @@
+app:
+  replicas: 1
+  container:
+#    image: Image to use
+    port: 8080
+    pullPolicy: always
+#  host: Ingress hostname
+  path: /app
