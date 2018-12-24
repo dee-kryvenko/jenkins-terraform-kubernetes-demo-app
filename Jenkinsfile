@@ -24,12 +24,13 @@ podTemplate(label: label, containers: [
         }
         stage ('Image') {
             container('awscli') {
+                env.AWS_ACCOUNT_ID = sh(script: 'aws sts get-caller-identity --output text --query "Account"', returnStdout: true).trim()
                 sh 'aws ecr get-login --region us-east-1 --no-include-email > ecr_auth.sh'
             }
             container('docker') {
                 sh 'chmod +x ./ecr_auth.sh && ./ecr_auth.sh'
-                sh "docker build -t 427657384269.dkr.ecr.us-east-1.amazonaws.com/jenkins-terraform-kubernetes-demo-apps:${env.BUILD_NUMBER} ."
-                sh "docker push 427657384269.dkr.ecr.us-east-1.amazonaws.com/jenkins-terraform-kubernetes-demo-apps:${env.BUILD_NUMBER}"
+                sh "docker build -t ${env.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/jenkins-terraform-kubernetes-demo-apps:${env.BUILD_NUMBER} ."
+                sh "docker push ${env.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/jenkins-terraform-kubernetes-demo-apps:${env.BUILD_NUMBER}"
             }
         }
     }
