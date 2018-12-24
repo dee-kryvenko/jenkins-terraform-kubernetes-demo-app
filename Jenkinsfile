@@ -22,7 +22,7 @@ podTemplate(label: label, containers: [
                 sh 'mvn package'
             }
         }
-        stage ('Image') {
+        stage ('Deploy') {
             container('awscli') {
                 env.AWS_ACCOUNT_ID = sh(script: 'aws sts get-caller-identity --output text --query "Account"', returnStdout: true).trim()
                 sh 'aws ecr get-login --region us-east-1 --no-include-email > ecr_auth.sh'
