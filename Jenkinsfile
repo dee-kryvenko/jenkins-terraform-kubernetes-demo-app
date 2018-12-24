@@ -28,8 +28,8 @@ podTemplate(label: label, containers: [
             }
             container('docker') {
                 sh 'chmod +x ./ecr_auth.sh && ./ecr_auth.sh'
-                sh 'docker build -t 427657384269.dkr.ecr.us-east-1.amazonaws.com/jenkins-terraform-kubernetes-demo-app .'
-                sh 'docker push 427657384269.dkr.ecr.us-east-1.amazonaws.com/jenkins-terraform-kubernetes-demo-app'
+                sh 'docker build -t 427657384269.dkr.ecr.us-east-1.amazonaws.com/jenkins-terraform-kubernetes-demo-apps:latest .'
+                sh 'docker push 427657384269.dkr.ecr.us-east-1.amazonaws.com/jenkins-terraform-kubernetes-demo-apps:latest'
             }
         }
     }
