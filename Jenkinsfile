@@ -1,4 +1,4 @@
-def label = "jenkins-terraform-kubernetes-demo-app.${env.BUILD_NUMBER}.${UUID.randomUUID().toString()}"
+def label = "jenkins-terraform-kubernetes-demo-app-${env.BUILD_NUMBER}-${UUID.randomUUID().toString()}".replaceAll('-', '.')
 
 podTemplate(label: label, containers: [
     containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:3.27-1-alpine'),
