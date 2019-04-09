@@ -34,7 +34,7 @@ podTemplate(label: label, containers: [
                     sh "docker build -t ${image} ."
                     sh "docker push ${image}"
                 }
-                def ingress = sh(script: "basename $(dirname '${env.JENKINS_URL}')", returnStdout: true).trim()
+                def ingress = sh(script: "basename \$(dirname '${env.JENKINS_URL}')", returnStdout: true).trim()
                 container('helm') {
                     sh "helm upgrade --namespace 'jenkins' --install --force 'jenkins-terraform-kubernetes-demo-app' './helm/jenkins-terraform-kubernetes-demo-app' --set app.container.image='${image}' --set app.host='${ingress}' --reset-values --wait"
                 }
